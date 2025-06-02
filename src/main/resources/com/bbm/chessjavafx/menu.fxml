@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bbm.chessjavafx.controller.MenuController">
+    <HBox prefHeight="400">
+        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="-Infinity" prefWidth="215.0" spacing="20.0">
+            <Label style="-fx-font-size: 32px;" text="Шахи" />
+            <Button fx:id="startButton" onAction="#openBoard" prefHeight="26.0" prefWidth="100.0" text="Почати гру" />
+            <Button prefHeight="26.0" prefWidth="100.0" text="Налаштування" />
+            <Button onAction="#exitGame" prefHeight="26.0" prefWidth="100.0" text="Вихід" />
+        </VBox>
+        <VBox prefHeight="372.0" prefWidth="380.0">
+            
+        </VBox>
+    </HBox>
+</AnchorPane>

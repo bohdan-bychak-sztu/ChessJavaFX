@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="600" prefWidth="900" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.bbm.chessjavafx.controller.GameController">
+
+    <!-- Верхня панель -->
+    <top>
+        <HBox spacing="10" style="-fx-background-color: #ddd; -fx-padding: 10">
+            <Button onAction="#goBackToMenu" text="Назад в меню" />
+            <Button text="Нова гра" />
+            <Button text="Зберегти" />
+        </HBox>
+    </top>
+
+    <!-- Шахова дошка по центру -->
+    <center>
+        <GridPane fx:id="chessBoard" alignment="CENTER" gridLinesVisible="true" prefHeight="480" prefWidth="480" style="-fx-border-color: black;" />
+    </center>
+
+    <!-- Панель справа -->
+    <right>
+        <VBox prefHeight="554.0" prefWidth="200.0" spacing="10" style="-fx-padding: 10">
+            <Label text="Складність:" />
+            <ChoiceBox fx:id="difficultyChoice" prefHeight="26.0" prefWidth="180.0">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Легка" />
+                        <String fx:value="Середня" />
+                        <String fx:value="Складна" />
+                    </FXCollections>
+                </items>
+            </ChoiceBox>
+
+            <Label text="Тип гри:" />
+            <ChoiceBox fx:id="modeChoice" prefHeight="26.0" prefWidth="180.0">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Проти гравця" />
+                        <String fx:value="Проти бота" />
+                        <String fx:value="Онлайн" />
+                    </FXCollections>
+                </items>
+            </ChoiceBox>
+        </VBox>
+    </right>
+</BorderPane>
