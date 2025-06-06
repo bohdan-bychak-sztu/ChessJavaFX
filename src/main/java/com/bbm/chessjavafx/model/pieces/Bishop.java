@@ -2,30 +2,19 @@ package com.bbm.chessjavafx.model.pieces;
 
 import com.bbm.chessjavafx.model.game.Board;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Rook extends Piece {
-    private boolean hasMoved = false;
-
-    public Rook(boolean isWhite, Position position) {
+public class Bishop extends Piece {
+    public Bishop(boolean isWhite, Position position) {
         super(isWhite, position);
-    }
-
-    public boolean hasMoved() {
-        return hasMoved;
-    }
-
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
     }
 
     @Override
     public List<Position> getValidMoves(Board board) {
         List<Position> moves = new ArrayList<>();
-        int[] dx = {1, -1, 0, 0};
-        int[] dy = {0, 0, 1, -1};
+        int[] dx = {1, -1, -1, 1};
+        int[] dy = {1, -1, 1, -1};
 
         for (int dir = 0; dir < 4; dir++) {
             for (int step = 1; step < Board.SIZE; step++) {
@@ -47,17 +36,17 @@ public class Rook extends Piece {
     }
 
     @Override
+    public List<Position> getPseudoLegalMoves(Board board) {
+        return getValidMoves(board);
+    }
+
+    @Override
     public Piece clone() {
-        return new Rook(isWhite, new Position(position.getX(), position.getY()));
+        return new Bishop(isWhite, new Position(position.getX(), position.getY()));
     }
 
     @Override
     public String getFENSymbol() {
-        return isWhite ? "R" : "r";
-    }
-
-    @Override
-    public List<Position> getPseudoLegalMoves(Board board) {
-        return getValidMoves(board);
+        return isWhite ? "B" : "b";
     }
 }

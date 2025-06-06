@@ -13,4 +13,5 @@ module com.bbm.chessjavafx {
     opens com.bbm.chessjavafx.controller to javafx.fxml;
 
     exports com.bbm.chessjavafx;
+    exports com.bbm.chessjavafx.controller;
 }
