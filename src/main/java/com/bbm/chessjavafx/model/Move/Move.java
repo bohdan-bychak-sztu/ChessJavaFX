@@ -19,4 +19,9 @@ public class Move {
     public Position getTo() {
         return to;
     }
+
+    @Override
+    public String toString() {
+        return "Move[" + "piece=" + piece + ", to=" + to + ']';
+    }
 }

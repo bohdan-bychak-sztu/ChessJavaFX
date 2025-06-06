@@ -11,6 +11,11 @@ public class Position {
         this.y = y;
     }
 
+    public Position(String position) {
+        this.x = 8 - Character.getNumericValue(position.charAt(1));
+        this.y = position.charAt(0) - 97;
+    }
+
     public boolean isValid() {
         return x >= 0 && x < Board.SIZE && y >= 0 && y < Board.SIZE;
     }
