@@ -4,46 +4,62 @@
 <?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.RangeSlider?>
 
-<BorderPane prefHeight="600" prefWidth="900" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.bbm.chessjavafx.controller.GameController">
+<?import javafx.scene.text.Text?>
+<BorderPane prefHeight="600" prefWidth="900" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.bbm.chessjavafx.controller.GameController">
 
     <top>
         <HBox spacing="10" style="-fx-background-color: #ddd; -fx-padding: 10">
-            <Button onAction="#goBackToMenu" text="Назад в меню" />
-            <Button text="Нова гра" />
-            <Button text="Зберегти" />
+            <Button onAction="#goBackToMenu" text="Назад в меню"/>
+            <Button fx:id="newGame" onAction="#newGame" text="Нова гра"/>
+            <Button text="Зберегти"/>
+            <Button onAction="#copyFENToClipboard" text="Скопіювати FEN"/>
         </HBox>
     </top>
 
     <center>
-<!--        <fx:include source="game-board.fxml"/>-->
-        <GridPane fx:id="chessBoard" alignment="CENTER" gridLinesVisible="true" prefHeight="480" prefWidth="480" style="-fx-border-color: black;" />
+        <!--        <fx:include source="game-board.fxml"/>-->
+        <GridPane fx:id="chessBoard" alignment="CENTER" gridLinesVisible="true" prefHeight="480" prefWidth="480"
+                  style="-fx-border-color: black;"/>
     </center>
 
     <right>
-        <VBox prefHeight="554.0" prefWidth="200.0" spacing="10" style="-fx-padding: 10">
-            <Label text="Складність:" />
-            <ChoiceBox fx:id="difficultyChoice" prefHeight="26.0" prefWidth="180.0">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Easy" />
-                        <String fx:value="Medium" />
-                        <String fx:value="Hard" />
-                    </FXCollections>
-                </items>
-            </ChoiceBox>
+        <StackPane>
+            <VBox prefHeight="554.0" prefWidth="200.0" spacing="10" style="-fx-padding: 10" fx:id="game_setting"
+                  visible="true">
+                <Label text="Складність:"/>
+                <Slider fx:id="difficulty"
+                        min="0" max="20" value="10"
+                        showTickLabels="true"
+                        showTickMarks="true"
+                        majorTickUnit="10"
+                        minorTickCount="4"
+                        blockIncrement="1" />
+                <Label fx:id="difficultyLabel" text="Значення: "/>
 
-            <Label text="Тип гри:" />
-            <ChoiceBox fx:id="modeChoice" prefHeight="26.0" prefWidth="180.0">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Player vs Player" />
-                        <String fx:value="Player vs Bot"/>
-                        <String fx:value="Online" />
-                    </FXCollections>
-                </items>
-            </ChoiceBox>
-            <Button onAction="#startGame">Грати</Button>
-        </VBox>
+                <Label text="Тип гри:"/>
+                <ChoiceBox fx:id="modeChoice" prefHeight="26.0" prefWidth="180.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Player vs Player"/>
+                            <String fx:value="Player vs Bot"/>
+                            <String fx:value="Online"/>
+                        </FXCollections>
+                    </items>
+                </ChoiceBox>
+                <Button onAction="#startGame">Грати</Button>
+            </VBox>
+            <VBox prefHeight="554.0" prefWidth="200.0" spacing="10" style="-fx-padding: 10" fx:id="game_process"
+                  visible="false">
+                <Label text="Хід: "/>
+                <Text text="Білих" fx:id="turn_color"/>
+
+                <Label text="Лог ходів:"/>
+                <ListView fx:id="moveLogListView" prefHeight="400" prefWidth="180"/>
+            </VBox>
+
+        </StackPane>
     </right>
 </BorderPane>

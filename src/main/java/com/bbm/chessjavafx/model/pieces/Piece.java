@@ -41,4 +41,9 @@ public abstract class Piece {
     public abstract Piece clone();
 
     public abstract String getFENSymbol();
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

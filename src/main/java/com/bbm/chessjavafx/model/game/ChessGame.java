@@ -1,14 +1,24 @@
 package com.bbm.chessjavafx.model.game;
 
-import com.bbm.chessjavafx.model.Move.Move;
-import com.bbm.chessjavafx.model.Move.MoveCommand;
-import com.bbm.chessjavafx.model.Move.MoveStrategy;
+import com.bbm.chessjavafx.model.Move.*;
 import com.bbm.chessjavafx.model.pieces.Piece;
+import com.bbm.chessjavafx.model.pieces.Position;
+import com.bbm.chessjavafx.util.PGNConverter;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class ChessGame {
     private final Board board;
     private final MoveStrategy whitePlayer;
     private final MoveStrategy blackPlayer;
+    private Runnable onBoardUpdated;
+    private final ObservableList<String> moveLog = FXCollections.observableArrayList();
+    private int fullMoveNumber = 1;
+
+    public ObservableList<String> getMoveLog() {
+        return moveLog;
+    }
 
     public ChessGame(MoveStrategy whitePlayer, MoveStrategy blackPlayer) {
         this.board = new Board();
@@ -17,29 +27,93 @@ public class ChessGame {
     }
 
     public ChessGame(String boardType, MoveStrategy whitePlayer, MoveStrategy blackPlayer) {
-        this(whitePlayer, blackPlayer);
-        Board board = new Board();
+        this.board = new Board();
+        this.whitePlayer = whitePlayer;
+        this.blackPlayer = blackPlayer;
     }
 
-    public void start() {
-        while (!board.isGameOver()) {
-            boolean isWhite = board.isWhiteTurn();
-            MoveStrategy currentPlayer = isWhite ? whitePlayer : blackPlayer;
+    public HumanMoveStrategy getHumanMoveStrategy() {
+        if (whitePlayer instanceof HumanMoveStrategy) {
+            return (HumanMoveStrategy) whitePlayer;
+        }
+        if (blackPlayer instanceof HumanMoveStrategy) {
+            return (HumanMoveStrategy) blackPlayer;
+        }
+        return null;
+    }
 
-            Move move = currentPlayer.decideMove(board, isWhite);
-            if (move == null) continue;
+    public void startAsync() {
 
-            Piece piece = move.getPiece();
-            if (piece == null || piece.isWhite() != isWhite) continue;
-
-            if (board.isValidMove(piece, move.getTo())) {
-                MoveCommand command = new MoveCommand(board, piece, move.getTo());
-                command.execute();
-                board.toggleTurn();
-            }
+        if (board.isGameOver()) {
+            System.out.println("Гра завершена!");
+            return;
         }
 
-        System.out.println("Гра завершена!");
+        boolean isWhite = board.isWhiteTurn();
+        MoveStrategy currentPlayer = isWhite ? whitePlayer : blackPlayer;
+
+        System.out.println("Зараз хід: " + (isWhite ? "Білих" : "Чорних"));
+        System.out.println("Гравець: " + currentPlayer.getClass().getSimpleName());
+
+        if (currentPlayer instanceof HumanMoveStrategy) {
+            waitForHumanMove(isWhite);
+        } else {
+            Move move = currentPlayer.decideMove(board, isWhite);
+            processMove(move, isWhite);
+            startAsync();
+        }
+    }
+
+    private void waitForHumanMove(boolean isWhite) {
+        HumanMoveStrategy humanStrategy = (HumanMoveStrategy) (isWhite ? whitePlayer : blackPlayer);
+        humanStrategy.setOnMoveMade(move -> {
+            processMove(move, isWhite);
+            startAsync();
+        });
+    }
+
+    private void processMove(Move move, boolean isWhite) {
+        System.out.println(move.toString());
+        if (!isValidMoveForPlayer(move, isWhite)) {
+            System.out.println("Невалідний хід");
+            return;
+        }
+
+        Position from;
+        try {
+            from = move.getPiece().getPosition().clone();
+        }
+        catch (CloneNotSupportedException ignored) {
+            from = move.getPiece().getPosition();
+        }
+        new MoveCommand(board, move.getPiece(), move.getTo()).execute();
+
+        String notation = PGNConverter.toAlgebraicNotation(board, from, move, isWhite, fullMoveNumber);
+        moveLog.add(notation);
+
+        if (!isWhite) {
+            fullMoveNumber++;
+        }
+
+        if (onBoardUpdated != null) {
+            Platform.runLater(onBoardUpdated);
+        }
+
+    }
+
+    private boolean isValidMoveForPlayer(Move move, boolean isWhite) {
+        if (move == null) return false;
+
+        Piece piece = move.getPiece();
+        if (piece == null) return false;
+
+        if (piece.isWhite() != board.isWhiteTurn()) return false;
+
+        return board.isValidMove(piece, move.getTo());
+    }
+
+    public void setOnBoardUpdated(Runnable onBoardUpdated) {
+        this.onBoardUpdated = onBoardUpdated;
     }
 
     public Piece[][] getPieces() {

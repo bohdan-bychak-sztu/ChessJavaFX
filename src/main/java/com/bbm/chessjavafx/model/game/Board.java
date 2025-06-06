@@ -1,6 +1,8 @@
 package com.bbm.chessjavafx.model.game;
 
 import com.bbm.chessjavafx.model.pieces.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +11,7 @@ import java.util.List;
 public class Board {
     public static final int SIZE = 8;
     private final Piece[][] board;
-    private boolean whiteTurn = true;
+    private BooleanProperty whiteTurn = new SimpleBooleanProperty(true);
 
     public Board() {
         this(true);
@@ -21,6 +23,8 @@ public class Board {
             initializeDefaultPieces();
         }
     }
+
+
 
 
     private void initializeDefaultPieces() {
@@ -114,16 +118,16 @@ public class Board {
 
     public boolean isValidMove(Piece piece, Position to) {
         if (piece == null || !to.isValid()) return false;
-        if (piece.isWhite() != whiteTurn) return false;
+        if (piece.isWhite() != whiteTurn.get()) return false;
         return getLegalMoves(piece).contains(to);
     }
 
     public boolean isWhiteTurn() {
-        return whiteTurn;
+        return whiteTurn.get();
     }
 
     public void toggleTurn() {
-        whiteTurn = !whiteTurn;
+        whiteTurn.set(!whiteTurn.get());
     }
 
     public boolean isGameOver() {
@@ -250,4 +254,18 @@ public class Board {
         return copy;
     }
 
+    public boolean movePiece(String move) {
+        String from = move.substring(0, 2);
+        String to = move.substring(2, 4);
+        Position fromPosition = new Position(from);
+        Position toPosition = new Position(to);
+
+        movePiece(getPiece(fromPosition), toPosition);
+
+        return true;
+    }
+
+    public BooleanProperty isWhiteTurnProperty() {
+        return whiteTurn;
+    }
 }

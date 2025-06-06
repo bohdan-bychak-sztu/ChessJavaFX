@@ -10,15 +10,7 @@ import javafx.stage.Stage;
 public class ChessApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        StockfishEngine engine = new StockfishEngine();
-        if (engine.startEngine("../stockfish/stockfish-windows-x86-64-avx2.exe")) {
-            String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-            String bestMove = engine.getBestMove(fen);
-            System.out.println("Stockfish радить: " + bestMove);
-            engine.stop();
-        } else {
-            System.out.println("Не вдалося запустити движок.");
-        }
+
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/bbm/chessjavafx/menu.fxml"));
         Scene scene = new Scene(loader.load());
