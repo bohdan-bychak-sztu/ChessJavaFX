@@ -1,8 +1,9 @@
 package com.bbm.chessjavafx.controller;
 
+import com.bbm.chessjavafx.model.ChessGameModel;
+import com.bbm.chessjavafx.model.DatabaseManager;
 import com.bbm.chessjavafx.model.Move.HumanMoveStrategy;
 import com.bbm.chessjavafx.model.Move.Move;
-import com.bbm.chessjavafx.model.Move.MoveStrategy;
 import com.bbm.chessjavafx.model.Move.StockfishMoveStrategy;
 import com.bbm.chessjavafx.model.StockfishEngine;
 import com.bbm.chessjavafx.model.game.ChessGame;
@@ -28,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +43,10 @@ public class GameController {
     public Slider difficulty;
     public Label difficultyLabel;
     public ListView moveLogListView;
+    public TextField gameNameField;
+    public Button saveButton;
     StockfishEngine engine = new StockfishEngine();
+    DatabaseManager db = new DatabaseManager();
     @FXML
     private GridPane chessBoard;
     @FXML
@@ -49,8 +54,39 @@ public class GameController {
     private ChessGame game;
     private Piece selectedPiece;
 
+    public void loadGame(ChessGameModel game) {
+        System.out.println("Loading game " + game.getName());
+        System.out.println("FEN: " + game.getFen());
+        this.game = new ChessGame("saved");
+        FENConverter.convertFromFEN(game.getFen(), this.game.getBoard());
+        this.game.setPGN(game.getPgn());
+        setPieces();
+    }
+
     @FXML
     public void initialize() {
+        saveButton.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWin, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        Stage stage = (Stage) newWindow;
+                        stage.setOnCloseRequest(event -> {
+                            cleanup();
+                        });
+                    }
+                });
+            }
+        });
+
+        for (ChessGameModel g : db.loadAllGames()) {
+            System.out.println("ID: " + g.getId());
+            System.out.println("Name: " + g.getName());
+            System.out.println("PGN: " + g.getPgn());
+            System.out.println("FEN: " + g.getFen());
+            System.out.println("Date: " + g.getDateTime());
+            System.out.println("-----");
+        }
+
         try {
             engine.startEngine("../stockfish/stockfish-windows-x86-64-avx2.exe");
         } catch (Exception ignored) {
@@ -114,8 +150,6 @@ public class GameController {
         Move move = new Move(selectedPiece, new Position(row, col));
         game.getHumanMoveStrategy().notifyMoveMade(new Move(selectedPiece, new Position(row, col)));
 
-        //boolean isSuccess = game.getBoard().movePiece(selectedPiece, new Position(row, col));
-
         if (game.getBoard().isGameOver()) {
             System.out.println(game.getBoard().getGameResult());
         }
@@ -147,6 +181,24 @@ public class GameController {
     }
 
     private void cleanup() {
+        if (game != null) {
+
+            if (db.getGameByName("LastGame") != null) {
+                ChessGameModel game = db.getGameByName("LastGame");
+                game.setFen(FENConverter.convertToFEN(this.game.getBoard()));
+                game.setPgn(this.game.getPGN());
+                db.updateGame(game);
+            }
+            else {
+                ChessGameModel game = new ChessGameModel(
+                        this.game.getPGN(),
+                        "LastGame",
+                        FENConverter.convertToFEN(this.game.getBoard()),
+                        LocalDateTime.now()
+                );
+                db.saveGame(game);
+            }
+        }
         engine.stop();
         game = null;
     }
@@ -156,28 +208,34 @@ public class GameController {
         try {
             int difficultyValue = (int) difficulty.getValue();
             String mode = modeChoice.getValue();
-            MoveStrategy white;
-            MoveStrategy black;
+
+            if (this.game == null)
+                this.game = new ChessGame("default");
+
             switch (mode) {
                 case "Player vs Bot":
-                    white = new HumanMoveStrategy();
-                    black = new StockfishMoveStrategy(engine);
+                    this.game.setWhitePlayer(new HumanMoveStrategy());
+                    this.game.setBlackPlayer((new StockfishMoveStrategy(engine)));
                     engine.setSkillLevel(difficultyValue);
                     break;
                 case "Player vs Player":
-                    white = new HumanMoveStrategy();
-                    black = new HumanMoveStrategy();
+                    this.game.setWhitePlayer(new HumanMoveStrategy());
+                    this.game.setBlackPlayer((new HumanMoveStrategy()));
+                    break;
+                case "Bot vs Bot":
+                    this.game.setWhitePlayer(new StockfishMoveStrategy(engine));
+                    this.game.setBlackPlayer((new StockfishMoveStrategy(engine)));
+                    engine.setSkillLevel(difficultyValue);
                     break;
                 default:
-                    white = new HumanMoveStrategy();
-                    black = new StockfishMoveStrategy(engine);
+                    this.game.setWhitePlayer(new HumanMoveStrategy());
+                    this.game.setBlackPlayer((new StockfishMoveStrategy(engine)));
                     break;
             }
-            this.game = new ChessGame(white, black);
+
             setPieces();
             game_setting.visibleProperty().set(false);
             game_process.visibleProperty().set(true);
-            moveLogListView.setItems(game.getMoveLog());
 
             turn_color.textProperty().bind(Bindings.when(game.getBoard().isWhiteTurnProperty()).then("Білих").otherwise("Чорних"));
             game.setOnBoardUpdated(this::setPieces);
@@ -189,6 +247,7 @@ public class GameController {
 
     private void setPieces() {
         System.out.println("Ходять " + (game.getBoard().isWhiteTurn() ? "білі" : "чорні"));
+        moveLogListView.setItems(game.getMoveLog());
 
 
         Piece[][] pieces = game.getPieces();
@@ -224,4 +283,34 @@ public class GameController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    public void onSaveClicked(ActionEvent event) {
+        String gameName = gameNameField.getText().trim();
+
+        if (gameName.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Помилка", "Введіть назву партії.");
+            return;
+        }
+
+        ChessGameModel game = new ChessGameModel(
+                this.game.getPGN(),
+                gameNameField.getText(),
+                FENConverter.convertToFEN(this.game.getBoard()),
+                LocalDateTime.now()
+        );
+
+        db.saveGame(game);
+
+        showAlert(Alert.AlertType.INFORMATION, "Збережено", "Партію \"" + gameName + "\" збережено успішно.");
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
 }

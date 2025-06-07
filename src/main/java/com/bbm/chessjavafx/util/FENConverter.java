@@ -2,6 +2,7 @@ package com.bbm.chessjavafx.util;
 
 import com.bbm.chessjavafx.model.game.Board;
 import com.bbm.chessjavafx.model.pieces.Piece;
+import com.bbm.chessjavafx.model.pieces.Position;
 
 public class FENConverter {
     public static String convertToFEN(Board board) {
@@ -49,22 +50,18 @@ public class FENConverter {
 
         Piece[][] b = board.getBoard();
 
-        // White king side
         if (isCastlingPossible(b, 7, 4, 7)) {
             result.append('K');
         }
 
-        // White queen side
         if (isCastlingPossible(b, 7, 4, 0)) {
             result.append('Q');
         }
 
-        // Black king side
         if (isCastlingPossible(b, 0, 4, 7)) {
             result.append('k');
         }
 
-        // Black queen side
         if (isCastlingPossible(b, 0, 4, 0)) {
             result.append('q');
         }
@@ -80,4 +77,39 @@ public class FENConverter {
         if (!(rook instanceof com.bbm.chessjavafx.model.pieces.Rook r) || r.hasMoved()) return false;
         return king.isWhite() == rook.isWhite();
     }
+
+    private static Piece createPieceFromFEN(char pieceChar, boolean isWhite, Position position) {
+        return switch (pieceChar) {
+            case 'p' -> new com.bbm.chessjavafx.model.pieces.Pawn(isWhite, position);
+            case 'r' -> new com.bbm.chessjavafx.model.pieces.Rook(isWhite, position);
+            case 'n' -> new com.bbm.chessjavafx.model.pieces.Knight(isWhite, position);
+            case 'b' -> new com.bbm.chessjavafx.model.pieces.Bishop(isWhite, position);
+            case 'q' -> new com.bbm.chessjavafx.model.pieces.Queen(isWhite, position);
+            case 'k' -> new com.bbm.chessjavafx.model.pieces.King(isWhite, position);
+            default -> throw new IllegalArgumentException("Unknown FEN piece: " + pieceChar);
+        };
+    }
+
+    public static void convertFromFEN(String fen, Board board) {
+        String[] parts = fen.split(" ");
+        String[] rows = parts[0].split("/");
+
+        for (int row = 0; row < Board.SIZE; row++) {
+            int col = 0;
+            for (char c : rows[row].toCharArray()) {
+                if (Character.isDigit(c)) {
+                    col += c - '0';
+                } else {
+                    boolean isWhite = Character.isUpperCase(c);
+                    char pieceChar = Character.toLowerCase(c);
+                    Piece piece = createPieceFromFEN(pieceChar, isWhite, new Position(row, col));
+                    board.setPiece(new Position(row, col), piece);
+                    col++;
+                }
+            }
+        }
+
+        board.setWhiteTurn(parts[1].equals("w"));
+    }
+
 }

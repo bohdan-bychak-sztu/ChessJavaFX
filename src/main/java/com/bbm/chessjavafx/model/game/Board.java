@@ -1,6 +1,7 @@
 package com.bbm.chessjavafx.model.game;
 
 import com.bbm.chessjavafx.model.pieces.*;
+import com.bbm.chessjavafx.util.FENConverter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -19,6 +20,7 @@ public class Board {
 
     public Board(boolean initialize) {
         board = new Piece[SIZE][SIZE];
+
         if (initialize) {
             initializeDefaultPieces();
         }
@@ -267,5 +269,9 @@ public class Board {
 
     public BooleanProperty isWhiteTurnProperty() {
         return whiteTurn;
+    }
+
+    public void setWhiteTurn(boolean w) {
+        whiteTurn.set(w);
     }
 }

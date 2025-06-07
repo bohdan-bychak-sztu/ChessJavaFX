@@ -11,6 +11,12 @@ public class PGNConverter {
     private int moveNumber = 1;
     private boolean isWhiteTurn = true;
 
+    public PGNConverter() { }
+
+    public PGNConverter(String pgn) {
+        pgnBuilder.append(pgn);
+    }
+
     public void addMove(Board board, Position fromPos, Move move) {
         String notation = toAlgebraicNotation(board, fromPos, move, isWhiteTurn, moveNumber);
         if (isWhiteTurn) {

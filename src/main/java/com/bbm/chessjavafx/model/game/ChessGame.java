@@ -1,6 +1,9 @@
 package com.bbm.chessjavafx.model.game;
 
-import com.bbm.chessjavafx.model.Move.*;
+import com.bbm.chessjavafx.model.Move.HumanMoveStrategy;
+import com.bbm.chessjavafx.model.Move.Move;
+import com.bbm.chessjavafx.model.Move.MoveCommand;
+import com.bbm.chessjavafx.model.Move.MoveStrategy;
 import com.bbm.chessjavafx.model.pieces.Piece;
 import com.bbm.chessjavafx.model.pieces.Position;
 import com.bbm.chessjavafx.util.PGNConverter;
@@ -8,18 +11,17 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChessGame {
     private final Board board;
-    private final MoveStrategy whitePlayer;
-    private final MoveStrategy blackPlayer;
-    private Runnable onBoardUpdated;
     private final ObservableList<String> moveLog = FXCollections.observableArrayList();
+    private MoveStrategy whitePlayer;
+    private MoveStrategy blackPlayer;
+    private Runnable onBoardUpdated;
     private int fullMoveNumber = 1;
     private PGNConverter pgnConverter = new PGNConverter();
-
-    public ObservableList<String> getMoveLog() {
-        return moveLog;
-    }
 
     public ChessGame(MoveStrategy whitePlayer, MoveStrategy blackPlayer) {
         this.board = new Board();
@@ -33,6 +35,25 @@ public class ChessGame {
         this.blackPlayer = blackPlayer;
     }
 
+    public ChessGame(String boardType) {
+        if (boardType.equalsIgnoreCase("default"))
+            this.board = new Board(true);
+        else
+            this.board = new Board(false);
+    }
+
+    public ObservableList<String> getMoveLog() {
+        return FXCollections.observableArrayList(getPGN().replaceAll("\\d+\\.\\s", "").trim().split("\\s+"));
+    }
+
+    public String getPGN() {
+        return pgnConverter.getPGN();
+    }
+
+    public void setPGN(String pgn) {
+        pgnConverter = new PGNConverter(pgn);
+    }
+
     public HumanMoveStrategy getHumanMoveStrategy() {
         if (whitePlayer instanceof HumanMoveStrategy) {
             return (HumanMoveStrategy) whitePlayer;
@@ -41,6 +62,14 @@ public class ChessGame {
             return (HumanMoveStrategy) blackPlayer;
         }
         return null;
+    }
+
+    public void setWhitePlayer(MoveStrategy whitePlayer) {
+        this.whitePlayer = whitePlayer;
+    }
+
+    public void setBlackPlayer(MoveStrategy blackPlayer) {
+        this.blackPlayer = blackPlayer;
     }
 
     public void startAsync() {
@@ -87,9 +116,6 @@ public class ChessGame {
         moveCommand.execute();
 
         pgnConverter.addMove(clonedBoard, from.clone(), move.clone());
-        String notation = PGNConverter.toAlgebraicNotation(clonedBoard, from.clone(), move.clone(), isWhite, fullMoveNumber);
-
-        moveLog.add(notation);
 
         if (!isWhite) {
             fullMoveNumber++;
