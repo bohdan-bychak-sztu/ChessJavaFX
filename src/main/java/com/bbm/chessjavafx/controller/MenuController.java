@@ -23,7 +23,7 @@ public class MenuController {
     public ScrollPane savedGamesScrollPane;
     @FXML
     private Button startButton;
-    private DatabaseManager db = new DatabaseManager();
+    private final DatabaseManager db = new DatabaseManager();
 
     @FXML
     public void initialize() {
@@ -33,7 +33,7 @@ public class MenuController {
     @FXML
     private void openBoard() {
         if (db.getGameByName("LastGame") != null) {
-            loadGame(db.getGameById(1));
+            loadGame(db.getGameByName("LastGame"));
         }
         else
             try {

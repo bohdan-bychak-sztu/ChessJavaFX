@@ -60,9 +60,9 @@ public class PGNConverter {
         Board clonedBoard = board.copy();
         new MoveCommand(clonedBoard, piece, move.getTo()).execute();
 
-        if (clonedBoard.isCheckmate(!isWhite)) {
+        if (clonedBoard.getGameStateChecker().isCheckmate(!isWhite)) {
             checkOrMate = "#";
-        } else if (clonedBoard.isKingInCheck(!isWhite)) {
+        } else if (clonedBoard.getGameStateChecker().isKingInCheck(!isWhite)) {
             checkOrMate = "+";
         }
 

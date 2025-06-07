@@ -20,12 +20,12 @@ public class King extends Piece {
         for (Position move : moves) {
             Board copyBoard = board.copy();
             copyBoard.movePiece(this.clone(), move, true);
-            if (!copyBoard.isKingInCheck(isWhite)) {
+            if (!copyBoard.getGameStateChecker().isKingInCheck(isWhite)) {
                 validMoves.add(move);
             }
         }
 
-        if (!hasMoved && !board.isKingInCheck(isWhite)) {
+        if (!hasMoved && !board.getGameStateChecker().isKingInCheck(isWhite)) {
             int row = isWhite ? 7 : 0;
 
             if (canCastle(board, row, 7, new int[]{5, 6})) {
@@ -60,7 +60,7 @@ public class King extends Piece {
             Piece copyKing = clone.getPiece(from);
             clone.setPiece(from, null);
             clone.setPiece(to, copyKing);
-            if (clone.isKingInCheck(isWhite)) {
+            if (clone.getGameStateChecker().isKingInCheck(isWhite)) {
                 return false;
             }
         }

@@ -22,7 +22,6 @@
     </top>
 
     <center>
-        <!--        <fx:include source="game-board.fxml"/>-->
         <GridPane fx:id="chessBoard" alignment="CENTER" gridLinesVisible="true" prefHeight="480" prefWidth="480"
                   style="-fx-border-color: black;"/>
     </center>
@@ -45,10 +44,15 @@
                 <ChoiceBox fx:id="modeChoice" prefHeight="26.0" prefWidth="180.0">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Player vs Player"/>
-                            <String fx:value="Player vs Bot"/>
-                            <String fx:value="Bot vs Bot"/>
-                            <String fx:value="Online"/>
+
+                        </FXCollections>
+                    </items>
+                </ChoiceBox>
+                <Label text="Тип дошки:"/>
+                <ChoiceBox fx:id="chessBoardType" prefHeight="26.0" prefWidth="180.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+
                         </FXCollections>
                     </items>
                 </ChoiceBox>
