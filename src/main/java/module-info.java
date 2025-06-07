@@ -8,6 +8,7 @@ module com.bbm.chessjavafx {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires java.sql;
 
     opens com.bbm.chessjavafx to javafx.fxml;
     opens com.bbm.chessjavafx.controller to javafx.fxml;

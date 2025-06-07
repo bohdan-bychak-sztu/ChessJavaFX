@@ -14,9 +14,11 @@
         <HBox spacing="10" style="-fx-background-color: #ddd; -fx-padding: 10">
             <Button onAction="#goBackToMenu" text="Назад в меню"/>
             <Button fx:id="newGame" onAction="#newGame" text="Нова гра"/>
-            <Button text="Зберегти"/>
+            <TextField fx:id="gameNameField" promptText="Назва партії" prefWidth="200"/>
+            <Button fx:id="saveButton" onAction="#onSaveClicked" text="Зберегти"/>
             <Button onAction="#copyFENToClipboard" text="Скопіювати FEN"/>
         </HBox>
+
     </top>
 
     <center>
@@ -45,6 +47,7 @@
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="Player vs Player"/>
                             <String fx:value="Player vs Bot"/>
+                            <String fx:value="Bot vs Bot"/>
                             <String fx:value="Online"/>
                         </FXCollections>
                     </items>

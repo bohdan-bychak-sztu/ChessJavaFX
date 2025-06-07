@@ -3,16 +3,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.geometry.Insets?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bbm.chessjavafx.controller.MenuController">
     <HBox prefHeight="400">
         <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="-Infinity" prefWidth="215.0" spacing="20.0">
             <Label style="-fx-font-size: 32px;" text="Шахи" />
             <Button fx:id="startButton" onAction="#openBoard" prefHeight="26.0" prefWidth="100.0" text="Почати гру" />
-            <Button prefHeight="26.0" prefWidth="100.0" text="Налаштування" />
+            <Button fx:id="savedGamesButton" onAction="#showSavedGames" prefHeight="26.0" prefWidth="100.0" text="Збережені ігри" />
             <Button onAction="#exitGame" prefHeight="26.0" prefWidth="100.0" text="Вихід" />
         </VBox>
-        <VBox prefHeight="372.0" prefWidth="380.0">
-            
-        </VBox>
+        <ScrollPane fx:id="savedGamesScrollPane" fitToWidth="true" prefHeight="372.0" prefWidth="380.0" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox fx:id="savedGamesContainer" spacing="10.0">
+                    <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+
     </HBox>
 </AnchorPane>
