@@ -2,6 +2,7 @@ package com.bbm.chessjavafx.util;
 
 import com.bbm.chessjavafx.model.game.Board;
 import com.bbm.chessjavafx.model.pieces.Piece;
+import com.bbm.chessjavafx.model.pieces.PieceFactory;
 import com.bbm.chessjavafx.model.pieces.Position;
 
 public class FENConverter {
@@ -78,19 +79,7 @@ public class FENConverter {
         return king.isWhite() == rook.isWhite();
     }
 
-    private static Piece createPieceFromFEN(char pieceChar, boolean isWhite, Position position) {
-        return switch (pieceChar) {
-            case 'p' -> new com.bbm.chessjavafx.model.pieces.Pawn(isWhite, position);
-            case 'r' -> new com.bbm.chessjavafx.model.pieces.Rook(isWhite, position);
-            case 'n' -> new com.bbm.chessjavafx.model.pieces.Knight(isWhite, position);
-            case 'b' -> new com.bbm.chessjavafx.model.pieces.Bishop(isWhite, position);
-            case 'q' -> new com.bbm.chessjavafx.model.pieces.Queen(isWhite, position);
-            case 'k' -> new com.bbm.chessjavafx.model.pieces.King(isWhite, position);
-            default -> throw new IllegalArgumentException("Unknown FEN piece: " + pieceChar);
-        };
-    }
-
-    public static void convertFromFEN(String fen, Board board) {
+    public static void convertFromFEN(String fen, Board board, PieceFactory factory) {
         String[] parts = fen.split(" ");
         String[] rows = parts[0].split("/");
 
@@ -102,7 +91,7 @@ public class FENConverter {
                 } else {
                     boolean isWhite = Character.isUpperCase(c);
                     char pieceChar = Character.toLowerCase(c);
-                    Piece piece = createPieceFromFEN(pieceChar, isWhite, new Position(row, col));
+                    Piece piece = factory.createPiece(pieceChar, isWhite, new Position(row, col));
                     board.setPiece(new Position(row, col), piece);
                     col++;
                 }

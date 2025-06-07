@@ -7,6 +7,7 @@ import com.bbm.chessjavafx.model.Move.Move;
 import com.bbm.chessjavafx.model.Move.StockfishMoveStrategy;
 import com.bbm.chessjavafx.model.game.ChessGame;
 import com.bbm.chessjavafx.model.game.ChessPosition;
+import com.bbm.chessjavafx.model.pieces.ChessPieceFactory;
 import com.bbm.chessjavafx.model.pieces.Piece;
 import com.bbm.chessjavafx.model.pieces.Position;
 import com.bbm.chessjavafx.services.ChessBoardRenderer;
@@ -158,10 +159,23 @@ public class GameController {
     public void loadGame(ChessGameModel gameModel) {
         if (gameModel != null) {
             this.game = new ChessGame(new HumanMoveStrategy(), new StockfishMoveStrategy(stockfishService.getEngine()), ChessPosition.EMPTY);
-            FENConverter.convertFromFEN(gameModel.getFen(), game.getBoard());
+            FENConverter.convertFromFEN(gameModel.getFen(), game.getBoard(), new ChessPieceFactory());
             game.setPGN(gameModel.getPgn());
-            renderBoard();
+            startLoadedGame();
         }
+    }
+
+    private void startLoadedGame(){
+        if (game == null)
+            game = new ChessGame(ChessPosition.EMPTY);
+        game.setWhitePlayer(new HumanMoveStrategy());
+        game.setBlackPlayer(new StockfishMoveStrategy(stockfishService.getEngine()));
+        renderBoard();
+        game_setting.setVisible(false);
+        game_process.setVisible(true);
+        turn_color.textProperty().bind(Bindings.when(game.getBoard().isWhiteTurnProperty()).then("Білих").otherwise("Чорних"));
+        game.setOnBoardUpdated(this::renderBoard);
+        game.startAsync();
     }
 
     @FXML

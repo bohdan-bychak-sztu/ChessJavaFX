@@ -6,7 +6,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Rook extends Piece {
+public class Rook extends Piece implements Cloneable {
     private boolean hasMoved = false;
 
     public Rook(boolean isWhite, Position position) {

@@ -5,7 +5,7 @@ import com.bbm.chessjavafx.model.game.Board;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Knight extends Piece {
+public class Knight extends Piece implements Cloneable {
     public Knight(boolean isWhite, Position position) {
         super(isWhite, position);
     }

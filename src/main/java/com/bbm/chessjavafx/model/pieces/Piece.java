@@ -4,7 +4,7 @@ import com.bbm.chessjavafx.model.game.Board;
 
 import java.util.List;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable {
     protected final boolean isWhite;
     protected Position position;
 

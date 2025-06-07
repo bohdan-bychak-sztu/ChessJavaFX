@@ -42,7 +42,7 @@ public class Board {
     }
 
     private void initializePieces(String fen) {
-        FENConverter.convertFromFEN(fen, this);
+        FENConverter.convertFromFEN(fen, this, new ChessPieceFactory());
     }
 
     public boolean movePiece(Piece piece, Position to) {
