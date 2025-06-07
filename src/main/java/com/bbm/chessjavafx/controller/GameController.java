@@ -32,6 +32,9 @@ import javafx.stage.Stage;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameController {
 
@@ -154,6 +157,7 @@ public class GameController {
     private void renderBoard() {
         boardRenderer.render(game.getPieces());
         moveLogListView.setItems(game.getMoveLog());
+        showAlert(Alert.AlertType.INFORMATION, "Гра закінчена", game.getBoard().getGameResult());
     }
 
     public void loadGame(ChessGameModel gameModel) {
@@ -165,7 +169,7 @@ public class GameController {
         }
     }
 
-    private void startLoadedGame(){
+    private void startLoadedGame() {
         if (game == null)
             game = new ChessGame(ChessPosition.EMPTY);
         game.setWhitePlayer(new HumanMoveStrategy());

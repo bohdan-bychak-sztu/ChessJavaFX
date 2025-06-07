@@ -1,6 +1,9 @@
 package com.bbm.chessjavafx.model.game;
 
-import com.bbm.chessjavafx.model.Move.*;
+import com.bbm.chessjavafx.model.Move.HumanMoveStrategy;
+import com.bbm.chessjavafx.model.Move.Move;
+import com.bbm.chessjavafx.model.Move.MoveCommand;
+import com.bbm.chessjavafx.model.Move.MoveStrategy;
 import com.bbm.chessjavafx.model.pieces.Piece;
 import com.bbm.chessjavafx.model.pieces.Position;
 import com.bbm.chessjavafx.util.PGNConverter;
@@ -17,15 +20,15 @@ public class ChessGame {
     private Runnable onBoardUpdated;
     private int fullMoveNumber = 1;
 
+    public ChessGame(ChessPosition position) {
+        this(null, null, position);
+    }
+
     public ChessGame(MoveStrategy whitePlayer, MoveStrategy blackPlayer, ChessPosition position) {
         this.board = new Board(position);
         this.pgnConverter = new PGNConverter();
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
-    }
-
-    public ChessGame(ChessPosition position) {
-        this(null, null, position);
     }
 
     public ChessGame(String type) {
@@ -97,7 +100,6 @@ public class ChessGame {
         }
     }
 
-    // === Геттери та сеттери ===
 
     public ObservableList<String> getMoveLog() {
         return FXCollections.observableArrayList(
@@ -109,12 +111,12 @@ public class ChessGame {
         this.onBoardUpdated = listener;
     }
 
-    public void setPGN(String pgn) {
-        pgnConverter = new PGNConverter(pgn);
-    }
-
     public String getPGN() {
         return pgnConverter.getPGN();
+    }
+
+    public void setPGN(String pgn) {
+        pgnConverter = new PGNConverter(pgn);
     }
 
     public void setWhitePlayer(MoveStrategy whitePlayer) {
