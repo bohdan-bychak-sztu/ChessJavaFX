@@ -29,6 +29,11 @@ public class Position {
     }
 
     @Override
+    public int hashCode() {
+        return x * 31 + y;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Position p)) return false;
@@ -36,18 +41,16 @@ public class Position {
     }
 
     @Override
-    public int hashCode() {
-        return x * 31 + y;
+    public Position clone() {
+        try {
+            Position position = (Position) super.clone();
+        } catch (CloneNotSupportedException ignored) {
+        }
+        return new Position(this.x, this.y);
     }
 
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
-    }
-
-    @Override
-    public Position clone() throws CloneNotSupportedException {
-        Position position = (Position) super.clone();
-        return new Position(this.x, this.y);
     }
 }

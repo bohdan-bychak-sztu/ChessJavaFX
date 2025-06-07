@@ -21,6 +21,11 @@ public class Move {
     }
 
     @Override
+    public Move clone() {
+        return new Move(piece.clone(), to.clone());
+    }
+
+    @Override
     public String toString() {
         return "Move[" + "piece=" + piece + ", to=" + to + ']';
     }

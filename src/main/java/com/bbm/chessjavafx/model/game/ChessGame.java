@@ -15,6 +15,7 @@ public class ChessGame {
     private Runnable onBoardUpdated;
     private final ObservableList<String> moveLog = FXCollections.observableArrayList();
     private int fullMoveNumber = 1;
+    private PGNConverter pgnConverter = new PGNConverter();
 
     public ObservableList<String> getMoveLog() {
         return moveLog;
@@ -80,15 +81,14 @@ public class ChessGame {
         }
 
         Position from;
-        try {
-            from = move.getPiece().getPosition().clone();
-        }
-        catch (CloneNotSupportedException ignored) {
-            from = move.getPiece().getPosition();
-        }
-        new MoveCommand(board, move.getPiece(), move.getTo()).execute();
+        from = move.getPiece().getPosition().clone();
+        Board clonedBoard = board.copy();
+        MoveCommand moveCommand = new MoveCommand(board, move.getPiece(), move.getTo());
+        moveCommand.execute();
 
-        String notation = PGNConverter.toAlgebraicNotation(board, from, move, isWhite, fullMoveNumber);
+        pgnConverter.addMove(clonedBoard, from.clone(), move.clone());
+        String notation = PGNConverter.toAlgebraicNotation(clonedBoard, from.clone(), move.clone(), isWhite, fullMoveNumber);
+
         moveLog.add(notation);
 
         if (!isWhite) {
